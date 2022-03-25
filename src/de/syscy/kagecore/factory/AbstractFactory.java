@@ -21,7 +21,7 @@ public abstract class AbstractFactory<T> implements IFactory<T> {
         }
 
         File[] files = folder.listFiles(file -> file.isDirectory() || file.getName().endsWith("." + templateFileExtension));
-
+        KageCore.debugMessage("recursive test call from load Templates!");
         for (File file : files != null ? files : new File[0]) {
             if (file.isDirectory()) {
                 loadTemplates(file, templateFileExtension);
