@@ -92,7 +92,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: codeCoverageReport
+          arguments: test
           
 
       - name: Install SSH Key
