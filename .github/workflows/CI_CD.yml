@@ -69,7 +69,7 @@ jobs:
       - name: Jar
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: shadowJar -PprojVersion=${{ steps.versioning.outputs.version}}
+          arguments: jar -PprojVersion=${{ steps.versioning.outputs.version}}
 
       - name: Test
         uses: gradle/gradle-build-action@v2
@@ -87,7 +87,7 @@ jobs:
         run: ssh-keyscan -H ${{ env.SSH_HOST }} >> ~/.ssh/known_hosts
         
       - name: Rsync new version of files
-        run: rsync */build/libs/*-all.jar ${{ env.SSH_USER }}:~/KageCloudUpdates/
+        run: rsync /build/libs/KageCore*.jar ${{ env.SSH_USER }}:~/KageCloudUpdates/
         
       - name: SSH into dev and Update plugins
         run: ssh ${{ env.SSH_USER }} < scripts/updateKageCloud
@@ -102,43 +102,9 @@ jobs:
           repository: maven-snapshots
           coordinates: groupId=de.syscy artifactId=kagecloud-core version=${{steps.versioning.outputs.version}}
           assets: extension=jar,generate-pom=true,packaging=jar
-          filename: core/build/libs/core-${{steps.versioning.outputs.version}}-all.jar
+          filename: build/libs/KageCore-${{steps.versioning.outputs.version}}.jar
       
-      - name: Nexus Repo Publish Wrapper
-        uses: sonatype-nexus-community/nexus-repo-github-action@master
-        with:
-          serverUrl: https://repo.syscy.de/
-          username: syscy-githubAction-ci
-          password: ${{ secrets.NEXUS_PASSWORD }}
-          format: maven2
-          repository: maven-snapshots
-          coordinates: groupId=de.syscy artifactId=kagecloud-wrapper version=${{steps.versioning.outputs.version}}
-          assets: extension=jar,generate-pom=true,packaging=jar
-          filename: wrapper/build/libs/wrapper-${{steps.versioning.outputs.version}}-all.jar
-
-      - name: Nexus Repo Publish Plugin
-        uses: sonatype-nexus-community/nexus-repo-github-action@master
-        with:
-          serverUrl: https://repo.syscy.de/
-          username: syscy-githubAction-ci
-          password: ${{ secrets.NEXUS_PASSWORD }}
-          format: maven2
-          repository: maven-snapshots
-          coordinates: groupId=de.syscy artifactId=kagecloud-plugin version=${{steps.versioning.outputs.version}}
-          assets: extension=jar,generate-pom=true,packaging=jar
-          filename: plugin/build/libs/plugin-${{steps.versioning.outputs.version}}-all.jar
-
-      - name: Nexus Repo Publish Velocity
-        uses: sonatype-nexus-community/nexus-repo-github-action@master
-        with:
-          serverUrl: https://repo.syscy.de/
-          username: syscy-githubAction-ci
-          password: ${{ secrets.NEXUS_PASSWORD }}
-          format: maven2
-          repository: maven-snapshots
-          coordinates: groupId=de.syscy artifactId=kagecloud-velocity version=${{steps.versioning.outputs.version}}
-          assets: extension=jar,generate-pom=true,packaging=jar
-          filename: velocity/build/libs/velocity-${{steps.versioning.outputs.version}}-all.jar
+      
 
       - name: "Build Changelog"
         id: build_changelog
