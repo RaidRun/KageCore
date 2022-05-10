@@ -9,25 +9,7 @@ jobs:
   Deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Configuration for master branch
-        if: ${{ github.ref == 'refs/heads/master' }}
-        # Side note, I can run any Linux command here, not just 'echo'
-        run: |
-          echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
-          echo "SSH_HOST=${{ secrets.PROD_SSH_HOST }} " >> $GITHUB_ENV
-          echo "SSH_USER=${{ secrets.PROD_SSH_USER }} " >> $GITHUB_ENV
-          echo "PRERELEASE=false" >> $GITHUB_ENV
-          echo "discord=production" >> $GITHUB_ENV
-          echo "changlog_config="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
-      - name: Configuration for develop branch
-        if: ${{ github.ref == 'refs/heads/develop' }}
-        run: |
-          echo "SSH_PRIVATE_KEY=${{ secrets.DEV_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
-          echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }} " >> $GITHUB_ENV
-          echo "SSH_USER=${{ secrets.DEV_SSH_USER }} " >> $GITHUB_ENV
-          echo "PRERELEASE=true" >> $GITHUB_ENV
-          echo "discord=development" >> $GITHUB_ENV
-          echo "changlog_config="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
+
       - uses: deepakputhraya/action-branch-name@master
         with:
           regex: '([a-z])+\/([a-z])+' # Regex the branch should match. This example enforces grouping
@@ -43,7 +25,7 @@ jobs:
       
       - name: Git Semantic Version
         if: ${{ github.ref == 'refs/heads/develop' }}
-        id: versioning
+        id: versioning_develop
         # You may pin to the exact commit or the version.
         # uses: PaulHatch/semantic-version@3d2ea28b25c9a892b07cd24b5675300b701fcef5
         uses: PaulHatch/semantic-version@v4.0.3
@@ -59,7 +41,7 @@ jobs:
 
       - name: Git Semantic Version
         if: ${{ github.ref == 'refs/heads/master' }}
-        id: versioning
+        id: versioning_prod
         # You may pin to the exact commit or the version.
         # uses: PaulHatch/semantic-version@3d2ea28b25c9a892b07cd24b5675300b701fcef5
         uses: PaulHatch/semantic-version@v4.0.3
@@ -72,6 +54,32 @@ jobs:
           minor_pattern: "feat:"
           # Pattern to use when formatting output version
           format: "v${major}.${minor}.${patch}"
+    
+      - name: Configuration for master branch
+        if: ${{ github.ref == 'refs/heads/master' }}
+        # Side note, I can run any Linux command here, not just 'echo'
+        env: 
+          version: ${{ steps.versioning_prod.outputs.version}}
+        run: |
+          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
+          echo "SSH_HOST=${{ secrets.PROD_SSH_HOST }} " >> $GITHUB_ENV
+          echo "SSH_USER=${{ secrets.PROD_SSH_USER }} " >> $GITHUB_ENV
+          echo "PRERELEASE=false" >> $GITHUB_ENV
+          echo "discord=production" >> $GITHUB_ENV
+          echo "changlog_config="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
+      - name: Configuration for develop branch
+        if: ${{ github.ref == 'refs/heads/develop' }}
+        env: 
+          version: ${{ steps.versioning_dev.outputs.version}}
+        run: |
+          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "SSH_PRIVATE_KEY=${{ secrets.DEV_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
+          echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }} " >> $GITHUB_ENV
+          echo "SSH_USER=${{ secrets.DEV_SSH_USER }} " >> $GITHUB_ENV
+          echo "PRERELEASE=true" >> $GITHUB_ENV
+          echo "discord=development" >> $GITHUB_ENV
+          echo "changlog_config="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
       
       - name: Make gradlew executeable
         run: chmod +x gradlew
@@ -84,7 +92,7 @@ jobs:
       - name: Jar
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: jar -PprojVersion=${{ steps.versioning.outputs.version}}
+          arguments: jar -PprojVersion=${{ env.VERSION }}
 
       - name: Test
         uses: gradle/gradle-build-action@v2
@@ -115,9 +123,9 @@ jobs:
           password: ${{ secrets.NEXUS_PASSWORD }}
           format: maven2
           repository: maven-snapshots
-          coordinates: groupId=de.syscy artifactId=kagecloud-core version=${{steps.versioning.outputs.version}}
+          coordinates: groupId=de.syscy artifactId=kagecloud-core version=${{ env.VERSION }}
           assets: extension=jar,generate-pom=true,packaging=jar
-          filename: build/libs/KageCore-${{steps.versioning.outputs.version}}.jar
+          filename: build/libs/KageCore-${{ env.VERSION }}.jar
       
       
 
@@ -138,11 +146,11 @@ jobs:
         uses: ncipollo/release-action@v1.9.0
         with:
           # An optional name for the release. If this is omitted the tag will be used.
-          name: ${{ steps.versioning.outputs.version}} 
+          name: ${{ env.VERSION }}
           prerelease: ${{env.PRERELEASE}}
           generateReleaseNotes: false
           body: ${{steps.build_changelog.outputs.changelog}}
-          tag: ${{ steps.versioning.outputs.version}}
+          tag: ${{ env.VERSION }}
           # The Github token.
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "*/build/libs/*-all.jar"
