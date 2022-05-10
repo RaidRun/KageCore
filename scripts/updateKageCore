@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#Core Updates
+mv -f ~/KageCoreUpdates/KageCore* ~/wrapper/sharedData/plugins/KageCore.jar
+
+curl localhost:8000/api/UpdateKage
+sudo systemctl restart KageCloud | now + 5 minutes
+rm -rf ~/KageCloudUpdates

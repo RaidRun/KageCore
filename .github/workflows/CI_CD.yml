@@ -87,10 +87,10 @@ jobs:
         run: ssh-keyscan -H ${{ env.SSH_HOST }} >> ~/.ssh/known_hosts
         
       - name: Rsync new version of files
-        run: rsync /build/libs/KageCore*.jar ${{ env.SSH_USER }}:~/KageCloudUpdates/
+        run: rsync /build/libs/KageCore*.jar ${{ env.SSH_USER }}:~/KageCoreUpdates/
         
       - name: SSH into dev and Update plugins
-        run: ssh ${{ env.SSH_USER }} < scripts/updateKageCloud
+        run: ssh ${{ env.SSH_USER }} < scripts/updateKageCore
 
       - name: Nexus Repo Publish Core
         uses: sonatype-nexus-community/nexus-repo-github-action@master
