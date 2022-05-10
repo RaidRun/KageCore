@@ -60,22 +60,21 @@ jobs:
         # Side note, I can run any Linux command here, not just 'echo'
         run: |
           echo "VERSION=${{ steps.versioning_prod.outputs.version}}" >> $GITHUB_ENV
-          echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
           echo "SSH_HOST=${{ secrets.PROD_SSH_HOST }}" >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
           echo "PRERELEASE=false" >> $GITHUB_ENV
           echo "DISCORD=production" >> $GITHUB_ENV
-          echo "CHANGELOG_CONFIG="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
+          echo "CHANGELOG_CONFIG=workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
           
       - name: Configuration for develop branch
         if: ${{ github.ref == 'refs/heads/develop' }}
         run: |
           echo "VERSION=${{ steps.versioning_dev.outputs.version }}" >> $GITHUB_ENV
-
           echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }}" >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
           echo "PRERELEASE=true" >> $GITHUB_ENV
-
+          echo "DISCORD=development" >> $GITHUB_ENV
+          echo "CHANGELOG_CONFIG=workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
       
       - name: Make gradlew executeable
         run: chmod +x gradlew
@@ -97,9 +96,17 @@ jobs:
           
 
       - name: Install SSH Key
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{ env.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+          
+      - name: Install SSH Key
+        if: ${{ github.ref == 'refs/heads/develop' }}
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
           known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
           
       - name: Adding Known Hosts
