@@ -13,7 +13,6 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' }}
         # Side note, I can run any Linux command here, not just 'echo'
         run: |
-          echo "format=v${major}.${minor}.${patch}" >> $GITHUB_ENV
           echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
           echo "SSH_HOST=${{ secrets.PROD_SSH_HOST }} " >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.PROD_SSH_USER }} " >> $GITHUB_ENV
@@ -23,7 +22,6 @@ jobs:
       - name: Configuration for develop branch
         if: ${{ github.ref == 'refs/heads/develop' }}
         run: |
-          echo "format=v${major}.${minor}.${patch}-rc${increment}" >> $GITHUB_ENV
           echo "SSH_PRIVATE_KEY=${{ secrets.DEV_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
           echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }} " >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.DEV_SSH_USER }} " >> $GITHUB_ENV
@@ -44,6 +42,7 @@ jobs:
           fetch-depth: 0
       
       - name: Git Semantic Version
+        if: ${{ github.ref == 'refs/heads/develop' }}
         id: versioning
         # You may pin to the exact commit or the version.
         # uses: PaulHatch/semantic-version@3d2ea28b25c9a892b07cd24b5675300b701fcef5
@@ -56,7 +55,23 @@ jobs:
           # A string which, if present in a git commit, indicates that a change represents a minor (feature) change. Wrap with '/' to match using a regular expression.
           minor_pattern: "feat:"
           # Pattern to use when formatting output version
-          format: ${{env.format}}
+          format: "v${major}.${minor}.${patch}-rc${increment}"
+
+      - name: Git Semantic Version
+        if: ${{ github.ref == 'refs/heads/master' }}
+        id: versioning
+        # You may pin to the exact commit or the version.
+        # uses: PaulHatch/semantic-version@3d2ea28b25c9a892b07cd24b5675300b701fcef5
+        uses: PaulHatch/semantic-version@v4.0.3
+        with:
+          # The prefix to use to identify tags
+          tag_prefix: "v"
+          # A string which, if present in a git commit, indicates that a change represents a major (breaking) change. Wrap with '/' to match using a regular expression.
+          major_pattern: "BREAKING CHANGE:"
+          # A string which, if present in a git commit, indicates that a change represents a minor (feature) change. Wrap with '/' to match using a regular expression.
+          minor_pattern: "feat:"
+          # Pattern to use when formatting output version
+          format: "v${major}.${minor}.${patch}"
       
       - name: Make gradlew executeable
         run: chmod +x gradlew
