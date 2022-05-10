@@ -25,7 +25,7 @@ jobs:
       
       - name: Git Semantic Version
         if: ${{ github.ref == 'refs/heads/develop' }}
-        id: versioning_develop
+        id: versioning_dev
         # You may pin to the exact commit or the version.
         # uses: PaulHatch/semantic-version@3d2ea28b25c9a892b07cd24b5675300b701fcef5
         uses: PaulHatch/semantic-version@v4.0.3
@@ -71,7 +71,7 @@ jobs:
       - name: Configuration for develop branch
         if: ${{ github.ref == 'refs/heads/develop' }}
         env: 
-          version: ${{ steps.versioning_dev.outputs.version}}
+          version: ${{steps.versioning_dev.outputs.version}}
         run: |
           echo "VERSION=$version" >> $GITHUB_ENV
           echo "SSH_PRIVATE_KEY=${{ secrets.DEV_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
