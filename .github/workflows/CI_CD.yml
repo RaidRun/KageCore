@@ -71,7 +71,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/develop' }}
         run: |
           echo "VERSION=${{ steps.versioning_dev.outputs.version }}" >> $GITHUB_ENV
-          echo "SSH_PRIVATE_KEY=${{ secrets.DEV_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+
           echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }}" >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
           echo "PRERELEASE=true" >> $GITHUB_ENV
