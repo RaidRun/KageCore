@@ -126,7 +126,7 @@ jobs:
           password: ${{ secrets.NEXUS_PASSWORD }}
           format: maven2
           repository: maven-snapshots
-          coordinates: groupId=de.syscy artifactId=kagecloud-core version=${{ env.VERSION }}
+          coordinates: groupId=de.syscy artifactId=kagecore version=${{ env.VERSION }}
           assets: extension=jar,generate-pom=true,packaging=jar
           filename: build/libs/KageCore-${{ env.VERSION }}.jar
       
@@ -156,7 +156,7 @@ jobs:
           tag: ${{ env.VERSION }}
           # The Github token.
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "*/build/libs/*-all.jar"
+          artifacts: "build/libs/KageCore-${{ env.VERSION }}.jar"
           
       - name: Discord notification
         env:
