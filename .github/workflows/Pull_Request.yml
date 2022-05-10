@@ -1,0 +1,47 @@
+name: Pull Request
+on: [pull_request]
+
+jobs:
+  Pull_Request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: deepakputhraya/action-branch-name@master
+        with:
+          regex: '([a-z])+\/([a-z])+' # Regex the branch should match. This example enforces grouping
+          allowed_prefixes: 'feature,bug,fix' # All branches should start with the given prefix
+          ignore: master,develop # Ignore exactly matching branch names from convention
+          min_length: 5 # Min length of the branch name
+          max_length: 100 # Max length of the branch name
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Make gradlew executeable
+        run: chmod +x gradlew
+
+      - name: Set up JDK 14
+        uses: actions/setup-java@v2
+        with:
+          java-version: '14'
+          distribution: 'adopt-hotspot'
+      - name: Build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build --scan
+
+      - name: Test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: codeCoverageReport
+
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.2
+        with:
+          paths: ${{ github.workspace }}/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 60
+      
