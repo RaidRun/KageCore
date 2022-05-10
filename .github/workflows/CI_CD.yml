@@ -75,8 +75,7 @@ jobs:
           echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }}" >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
           echo "PRERELEASE=true" >> $GITHUB_ENV
-          echo "DISCORD=development" >> $GITHUB_ENV
-          echo "CHANGELOG_CONFIG="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
+
       
       - name: Make gradlew executeable
         run: chmod +x gradlew
