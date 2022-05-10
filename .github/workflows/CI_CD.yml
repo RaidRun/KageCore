@@ -58,10 +58,8 @@ jobs:
       - name: Configuration for master branch
         if: ${{ github.ref == 'refs/heads/master' }}
         # Side note, I can run any Linux command here, not just 'echo'
-        env: 
-          version: ${{ steps.versioning_prod.outputs.version}}
         run: |
-          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "VERSION=${{ steps.versioning_prod.outputs.version}}" >> $GITHUB_ENV
           echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
           echo "SSH_HOST=${{ secrets.PROD_SSH_HOST }} " >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.PROD_SSH_USER }} " >> $GITHUB_ENV
@@ -70,10 +68,8 @@ jobs:
           echo "changlog_config="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
       - name: Configuration for develop branch
         if: ${{ github.ref == 'refs/heads/develop' }}
-        env: 
-          version: ${{steps.versioning_dev.outputs.version}}
         run: |
-          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "VERSION=${{ steps.versioning_dev.outputs.version }}" >> $GITHUB_ENV
           echo "SSH_PRIVATE_KEY=${{ secrets.DEV_SSH_PRIVATE_KEY }} " >> $GITHUB_ENV
           echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }} " >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.DEV_SSH_USER }} " >> $GITHUB_ENV
