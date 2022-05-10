@@ -61,6 +61,11 @@ jobs:
         run: |
           echo "VERSION=${{ steps.versioning_prod.outputs.version}}" >> $GITHUB_ENV
           echo "SSH_PRIVATE_KEY=${{ secrets.PROD_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV
+          echo "SSH_HOST=${{ secrets.PROD_SSH_HOST }}" >> $GITHUB_ENV
+          echo "SSH_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
+          echo "PRERELEASE=false" >> $GITHUB_ENV
+          echo "DISCORD=production" >> $GITHUB_ENV
+          echo "CHANGELOG_CONFIG="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
           
       - name: Configuration for develop branch
         if: ${{ github.ref == 'refs/heads/develop' }}
@@ -70,8 +75,8 @@ jobs:
           echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }}" >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
           echo "PRERELEASE=true" >> $GITHUB_ENV
-          echo "discord=development" >> $GITHUB_ENV
-          echo "changlog_config="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
+          echo "DISCORD=development" >> $GITHUB_ENV
+          echo "CHANGELOG_CONFIG="workflow_configs/changelog_configuration_prod.json" >> $GITHUB_ENV
       
       - name: Make gradlew executeable
         run: chmod +x gradlew
@@ -125,7 +130,7 @@ jobs:
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v2.9.0
         with:
-          configuration: ${{ env.changelog_config }}
+          configuration: ${{ env.CHANGELOG_CONFIG }}
           # Defines the owner of the repository to create the changelog for
           owner: RaidRun
           # Defines the token to use to execute the git API requests with, uses `env.GITHUB_TOKEN` by default
@@ -152,6 +157,6 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed to ${{ secrets.discord }}.'
+          args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed to ${{ env.DISCORD }}.'
         
 
