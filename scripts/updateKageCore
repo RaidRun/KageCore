@@ -4,5 +4,5 @@
 mv -f ~/KageCoreUpdates/KageCore* ~/wrapper/sharedData/plugins/KageCore.jar
 
 curl localhost:8000/api/UpdateKage
-sudo systemctl restart kagecloud | now + 5 minutes
+echo "sudo systemctl restart kagecloud" | at now + 5 minutes
 rm -rf ~/KageCoreUpdates
