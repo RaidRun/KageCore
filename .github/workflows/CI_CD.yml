@@ -38,6 +38,7 @@ jobs:
           minor_pattern: "feat:"
           # Pattern to use when formatting output version
           format: "v${major}.${minor}.${patch}-rc${increment}"
+          search_commit_body: true
 
       - name: Git Semantic Version
         if: ${{ github.ref == 'refs/heads/master' }}
@@ -54,6 +55,7 @@ jobs:
           minor_pattern: "feat:"
           # Pattern to use when formatting output version
           format: "v${major}.${minor}.${patch}"
+          search_commit_body: true
     
       - name: Configuration for master branch
         if: ${{ github.ref == 'refs/heads/master' }}
