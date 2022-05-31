@@ -129,7 +129,7 @@ jobs:
           format: maven2
           repository: maven-snapshots
           coordinates: groupId=de.syscy artifactId=kagecore version=${{ env.VERSION }}
-          assets: '-Aextension=jar -Agenerate-pom=true' 
+          assets: '-Aextension=jar -Amaven2.generate-pom=true -Amaven2.packaging=jar' 
           filename: build/libs/KageCore-${{ env.VERSION }}.jar
       
       
