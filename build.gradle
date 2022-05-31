@@ -1,10 +1,19 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: "jacoco"
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = ["src/"]
 sourceSets.main.resources.srcDirs = ["res/"]
+sourceSets.test.java.srcDirs = ["test/"]
+
+if (project.hasProperty('projVersion')) {
+        project.version = project.projVersion
+    } else {
+        project.version = '1.0'
+    }
+
 
 repositories {
     mavenCentral()
@@ -27,6 +36,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor "org.projectlombok:lombok:1.18.20"
 
@@ -34,8 +44,33 @@ dependencies {
     implementation "com.sk89q.worldedit:worldedit-bukkit:7.2.6"
     implementation "com.comphenix.protocol:ProtocolLib:4.7.0"
     implementation "net.pl3x:purpur-server:1.16.5-SNAPSHOT"
+
+    testImplementation "org.mockito:mockito-core:3.+"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 javadoc {
     failOnError = false
 }
+
+test {
+        useJUnitPlatform()
+        finalizedBy jacocoTestReport
+    }
+
+    jacocoTestReport {
+        dependsOn test // tests are required to run before generating the report
+        reports {
+            xml.required = true
+            csv.required = true
+            html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+        }
+    }
+
+    jacoco {
+        toolVersion = "0.8.7"
+    }
+
+
