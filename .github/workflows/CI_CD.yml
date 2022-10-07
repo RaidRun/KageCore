@@ -61,7 +61,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' }}
         # Side note, I can run any Linux command here, not just 'echo'
         run: |
-          echo "VERSION=${{ steps.versioning_prod.outputs.version}}" >> $GITHUB_ENV
+          echo "VERSION=1.0.0-SNAPSHOT" >> $GITHUB_ENV
           echo "SSH_HOST=${{ secrets.PROD_SSH_HOST }}" >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.PROD_SSH_USER }}" >> $GITHUB_ENV
           echo "PRERELEASE=false" >> $GITHUB_ENV
@@ -71,7 +71,7 @@ jobs:
       - name: Configuration for develop branch
         if: ${{ github.ref == 'refs/heads/develop' }}
         run: |
-          echo "VERSION=${{ steps.versioning_dev.outputs.version }}" >> $GITHUB_ENV
+          echo "VERSION=1.0.0-SNAPSHOT" >> $GITHUB_ENV
           echo "SSH_HOST=${{ secrets.DEV_SSH_HOST }}" >> $GITHUB_ENV
           echo "SSH_USER=${{ secrets.DEV_SSH_USER }}" >> $GITHUB_ENV
           echo "PRERELEASE=true" >> $GITHUB_ENV
