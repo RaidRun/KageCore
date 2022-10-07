@@ -159,6 +159,7 @@ jobs:
           # The Github token.
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "build/libs/KageCore-${{ env.VERSION }}.jar"
+          allowUpdates: true
           
       - name: Discord notification
         env:
