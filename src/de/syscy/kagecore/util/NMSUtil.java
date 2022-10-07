@@ -12,7 +12,7 @@ import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(LombokExtensionUtility.class)
 public class NMSUtil {
-	//TODO: Update to use Reflect!!
+	//TODO: Update to use Reflect!
 	public static void sendPacket(Player player, Object packet) {
 		Reflect.on(player.getHandle()).field("playerConnection").call("sendPacket", packet);
 	}
