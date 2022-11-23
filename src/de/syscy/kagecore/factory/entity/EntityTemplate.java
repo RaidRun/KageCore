@@ -261,6 +261,7 @@ public class EntityTemplate implements IEntityTemplate {
 		specificEntityHandlers.put(EntityType.ILLUSIONER, new LivingEntityHandler<Illusioner>());
 		specificEntityHandlers.put(EntityType.LLAMA, new LivingEntityHandler<Llama>());
 		specificEntityHandlers.put(EntityType.PARROT, new LivingEntityHandler<Parrot>());
+		specificEntityHandlers.put(EntityType.PILLAGER, new LivingEntityHandler<Pillager>());
 
 		/*Set<EntityType> ignoreTypeSet = Collections.emptySet();
 		for(EntityType type : EntityType.values()) {
@@ -400,7 +401,7 @@ public class EntityTemplate implements IEntityTemplate {
 		@Override
 		public final void handleEntity(final IFactoryProviderPlugin plugin, final T livingEntity, final YamlConfiguration templateYaml) {
 			livingEntity.setAI(templateYaml.getBoolean("ai", true));
-			livingEntity.setCanPickupItems(templateYaml.getBoolean("canPickupItems", true));
+			livingEntity.setCanPickupItems(templateYaml.getBoolean("canPickupItems", false));
 			livingEntity.setCollidable(templateYaml.getBoolean("collidable", true));
 
 			if(templateYaml.contains("health")) {
